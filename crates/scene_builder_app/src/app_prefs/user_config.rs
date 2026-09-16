@@ -1,4 +1,4 @@
-use crate::theme;
+use crate::ui_base;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
@@ -21,7 +21,7 @@ impl ThemePref {
     }
 
     pub fn apply(self, ctx: &egui::Context) {
-        theme::apply(ctx, self.is_dark());
+        ui_base::apply(ctx, self.is_dark());
     }
 }
 
@@ -62,11 +62,11 @@ impl Default for Prefs {
     fn default() -> Self {
         Self {
             theme: ThemePref::System,
-            left_panel_width: 260.0,
-            right_panel_width: 300.0,
-            bottom_panel_height: crate::layout::POSITIONS_PANEL_FALLBACK_H,
-            window_width: crate::layout::WINDOW_DEFAULT_W,
-            window_height: crate::layout::WINDOW_DEFAULT_H,
+            left_panel_width: super::DEFAULT_LEFT_PANEL_WIDTH,
+            right_panel_width: super::DEFAULT_RIGHT_PANEL_WIDTH,
+            bottom_panel_height: crate::ui_base::POSITIONS_PANEL_FALLBACK_H,
+            window_width: crate::ui_base::WINDOW_DEFAULT_W,
+            window_height: crate::ui_base::WINDOW_DEFAULT_H,
             window_x: None,
             window_y: None,
             window_maximized: false,
@@ -106,11 +106,11 @@ impl Prefs {
     }
 
     pub fn apply_viewport(&self, mut viewport: egui::ViewportBuilder) -> egui::ViewportBuilder {
-        let w = self.window_width.max(crate::layout::WINDOW_MIN_W);
-        let h = self.window_height.max(crate::layout::WINDOW_MIN_H);
+        let w = self.window_width.max(crate::ui_base::WINDOW_MIN_W);
+        let h = self.window_height.max(crate::ui_base::WINDOW_MIN_H);
         viewport = viewport
             .with_inner_size([w, h])
-            .with_min_inner_size([crate::layout::WINDOW_MIN_W, crate::layout::WINDOW_MIN_H])
+            .with_min_inner_size([crate::ui_base::WINDOW_MIN_W, crate::ui_base::WINDOW_MIN_H])
             .with_maximized(self.window_maximized);
         if let (Some(x), Some(y)) = (self.window_x, self.window_y) {
             viewport = viewport.with_position([x, y]);
@@ -136,7 +136,7 @@ impl Prefs {
         if let Some(inner) = vp.inner_rect {
             let w = inner.width().round();
             let h = inner.height().round();
-            if w >= crate::layout::WINDOW_MIN_W && h >= crate::layout::WINDOW_MIN_H {
+            if w >= crate::ui_base::WINDOW_MIN_W && h >= crate::ui_base::WINDOW_MIN_H {
                 if (w - self.window_width).abs() > 1.0 || (h - self.window_height).abs() > 1.0 {
                     self.window_width = w;
                     self.window_height = h;

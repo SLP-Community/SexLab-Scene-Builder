@@ -1,6 +1,6 @@
 //! Bottom strip: actor slots shared by every stage in the scene.
 
-use crate::layout;
+use crate::ui_base;
 use egui::{Color32, RichText};
 use scene_builder_core::project::position::Position;
 use scene_builder_core::project::position_info::PositionInfo;
@@ -13,12 +13,12 @@ pub fn show(ui: &mut egui::Ui, scene: &mut Scene, race_keys: &[String]) -> (bool
     ensure_scene_positions(scene);
 
     let top = ui.next_widget_position().y;
-    crate::theme::fill_width(ui);
+    crate::ui_define::fill_width(ui);
     let mut changed = false;
     ui.horizontal(|ui| {
         ui.label(RichText::new("Scene Positions").strong());
         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-            crate::theme::info_tip(ui, "Position data shared between all stages in the scene.");
+            crate::ui_define::info_tip(ui, "Position data shared between all stages in the scene.");
             let at_cap = scene.positions.len() >= MAX_POSITIONS;
             let add = ui
                 .add_enabled(!at_cap, egui::Button::new("Add Position").small())
@@ -48,7 +48,7 @@ pub fn show(ui: &mut egui::Ui, scene: &mut Scene, race_keys: &[String]) -> (bool
     } else if n <= 3 {
         10.0
     } else {
-        layout::SPACE
+        ui_base::SPACE
     };
     // Own the gaps; default item_spacing would stack on top and shove the last card out.
     let card_w = ((budget - gap * n.saturating_sub(1) as f32) / n as f32)
@@ -126,19 +126,19 @@ pub fn show(ui: &mut egui::Ui, scene: &mut Scene, race_keys: &[String]) -> (bool
                                         }
                                     });
 
-                                ui.add_space(layout::SPACE_SM);
+                                ui.add_space(ui_base::SPACE_SM);
                                 ui.horizontal_wrapped(|ui| {
                                     ui.spacing_mut().item_spacing = egui::vec2(6.0, 4.0);
-                                    changed |= crate::theme::sex_radios(ui, &mut info.sex, is_human);
+                                    changed |= crate::ui_define::sex_flags(ui, &mut info.sex, is_human);
                                 });
 
-                                ui.add_space(layout::SPACE_XS);
+                                ui.add_space(ui_base::SPACE_XS);
                                 ui.separator();
-                                ui.add_space(layout::SPACE_XS);
+                                ui.add_space(ui_base::SPACE_XS);
 
                                 ui.horizontal_wrapped(|ui| {
                                     ui.spacing_mut().item_spacing = egui::vec2(6.0, 4.0);
-                                    changed |= crate::theme::state_flags(
+                                    changed |= crate::ui_define::state_flags(
                                         ui,
                                         &mut info.submissive,
                                         &mut info.vampire,
@@ -148,7 +148,7 @@ pub fn show(ui: &mut egui::Ui, scene: &mut Scene, race_keys: &[String]) -> (bool
                                     );
                                 });
 
-                                ui.add_space(layout::SPACE_SM);
+                                ui.add_space(ui_base::SPACE_SM);
                                 ui.horizontal(|ui| {
                                     ui.label("Scale").on_hover_text(
                                         "Actor scale factor used by SexLab for this position (typically 1.0).",
@@ -188,9 +188,9 @@ pub fn show(ui: &mut egui::Ui, scene: &mut Scene, race_keys: &[String]) -> (bool
 /// `min` hugs measured content so cards are never clipped. `default` restores the
 /// last user-resized height (clamped into range).
 pub fn panel_height_range(avail_h: f32, prefs_h: f32, needed: f32) -> (f32, f32, f32) {
-    let abs_max = layout::POSITIONS_PANEL_ABS_MAX.min(avail_h * layout::POSITIONS_PANEL_MAX_FRAC);
+    let abs_max = ui_base::POSITIONS_PANEL_ABS_MAX.min(avail_h * ui_base::POSITIONS_PANEL_MAX_FRAC);
     let max_h = abs_max.max(80.0);
-    let floor = layout::POSITIONS_HEADER_H + layout::POSITIONS_PANEL_CHROME;
+    let floor = ui_base::POSITIONS_HEADER_H + ui_base::POSITIONS_PANEL_CHROME;
     let min_h = needed.clamp(floor, max_h);
     let default_h = prefs_h.clamp(min_h, max_h);
     (min_h, default_h, max_h)

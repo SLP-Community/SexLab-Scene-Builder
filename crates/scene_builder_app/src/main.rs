@@ -3,6 +3,7 @@
 #![cfg_attr(target_os = "windows", windows_subsystem = "windows")]
 
 mod app;
+mod app_prefs;
 #[cfg(windows)]
 mod console_win;
 mod furniture;
@@ -10,14 +11,12 @@ mod graph;
 mod graph_layout;
 mod io;
 mod jobs;
-mod layout;
 mod positions;
-mod prefs;
 mod stage_editor;
-mod tag_presets;
-mod tag_tree;
-mod theme;
+mod tags;
 mod toasts;
+mod ui_base;
+mod ui_define;
 mod workspace;
 
 use app::SceneBuilderApp;
@@ -27,7 +26,7 @@ use std::path::PathBuf;
 
 fn main() -> eframe::Result<()> {
     let want_console = std::env::args().any(|a| a == "--console" || a == "-c");
-    let mut prefs = prefs::Prefs::load();
+    let mut prefs = app_prefs::Prefs::load();
     if want_console {
         prefs.show_console = true;
     }
@@ -55,7 +54,7 @@ fn main() -> eframe::Result<()> {
         SceneBuilderApp::APP_TITLE,
         options,
         Box::new(move |cc| {
-            theme::configure_fonts(&cc.egui_ctx);
+            ui_base::configure_fonts(&cc.egui_ctx);
             prefs.theme.apply(&cc.egui_ctx);
             Ok(Box::new(SceneBuilderApp::new(prefs)))
         }),

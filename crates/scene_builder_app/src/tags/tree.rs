@@ -1,8 +1,8 @@
 //! Tag editor: search/create plus framed SFW / NSFW / Custom groups.
 //! Selected tags are highlighted in-place (no separate “selected” chip list).
 
-use crate::layout;
-use crate::tag_presets::{TAGS_NSFW, TAGS_SFW};
+use super::presets::{TAGS_NSFW, TAGS_SFW};
+use crate::ui_base;
 use egui::{Color32, RichText, Stroke, TextEdit};
 
 #[derive(Debug, Clone)]
@@ -369,7 +369,8 @@ fn chip_wrap_row(ui: &mut egui::Ui, inner_w: f32, add_contents: impl FnOnce(&mut
         egui::Layout::left_to_right(egui::Align::Min).with_main_wrap(true),
         |ui| {
             ui.set_max_width(inner_w.max(1.0));
-            ui.spacing_mut().item_spacing = egui::vec2(layout::TAG_CHIP_GAP, layout::TAG_CHIP_GAP);
+            ui.spacing_mut().item_spacing =
+                egui::vec2(ui_base::TAG_CHIP_GAP, ui_base::TAG_CHIP_GAP);
             add_contents(ui);
         },
     );
@@ -599,9 +600,9 @@ fn group_frame(
                     accent.gamma_multiply(if dark { 0.55 } else { 0.35 }),
                 ))
                 .corner_radius(6.0)
-                .inner_margin(egui::Margin::same(layout::TAG_FRAME_PAD as i8))
+                .inner_margin(egui::Margin::same(ui_base::TAG_FRAME_PAD as i8))
                 .show(ui, |ui| {
-                    let inner_w = (outer_w - layout::TAG_FRAME_PAD * 2.0)
+                    let inner_w = (outer_w - ui_base::TAG_FRAME_PAD * 2.0)
                         .max(0.0)
                         .min(ui.available_width());
                     ui.set_min_width(inner_w);

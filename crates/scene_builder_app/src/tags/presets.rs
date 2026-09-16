@@ -1,18 +1,8 @@
 //! SFW / NSFW stage tag presets.
 
 pub const TAGS_SFW: &[&str] = &[
-    "Behind",
-    "Facing",
-    "Holding",
-    "Hugging",
-    "Kissing",
-    "Kneeling",
-    "Loving",
-    "Lying",
-    "Magic",
-    "Sitting",
-    "Spooning",
-    "Standing",
+    "Behind", "Facing", "Holding", "Hugging", "Kissing", "Kneeling", "Loving", "Lying", "Magic",
+    "Sitting", "Spooning", "Standing",
 ];
 
 pub const TAGS_NSFW: &[&str] = &[

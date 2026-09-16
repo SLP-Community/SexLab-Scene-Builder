@@ -33,7 +33,11 @@ pub fn show() -> bool {
         let title = to_wide("SexLab Scene Builder — Console");
         SetConsoleTitleW(title.as_ptr());
     }
-    let file = OpenOptions::new().write(true).read(true).open("CONOUT$").ok();
+    let file = OpenOptions::new()
+        .write(true)
+        .read(true)
+        .open("CONOUT$")
+        .ok();
     if let Ok(mut slot) = CONSOLE_OUT.lock() {
         *slot = file;
     }
