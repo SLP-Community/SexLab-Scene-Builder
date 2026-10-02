@@ -1,0 +1,7 @@
+[workspace]
+resolver = "2"
+members = [
+  "crates/scene_builder_core",
+  "crates/scene_builder_cli",
+  "crates/scene_builder_app",
+]

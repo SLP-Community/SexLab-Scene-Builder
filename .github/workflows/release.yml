@@ -16,19 +16,17 @@ jobs:
         include:
           - platform: ubuntu-22.04
             target: x86_64-unknown-linux-gnu
+            artifact: scene_builder_app-linux-x86_64
+            cli_artifact: scene_builder_cli-linux-x86_64
           - platform: windows-latest
             target: x86_64-pc-windows-msvc
+            artifact: scene_builder_app-windows-x86_64.exe
+            cli_artifact: scene_builder_cli-windows-x86_64.exe
 
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -38,24 +36,41 @@ jobs:
       - name: Rust cache
         uses: swatinem/rust-cache@v2
         with:
-          workspaces: './src-tauri -> target'
+          workspaces: '. -> target'
 
-      - name: Install Linux dependencies
+      - name: Install Linux GUI dependencies
         if: matrix.platform == 'ubuntu-22.04'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+          sudo apt-get install -y \
+            libgtk-3-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev \
+            libxkbcommon-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev \
+            libglib2.0-dev pkg-config
 
-      - name: Install frontend dependencies
-        run: npm ci
+      - name: Build release binaries
+        run: |
+          cargo build --release -p scene_builder_app -p scene_builder_cli --target ${{ matrix.target }}
 
-      - name: Build Tauri app
-        uses: tauri-apps/tauri-action@v0
+      - name: Package Linux artifacts
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          cp "target/${{ matrix.target }}/release/scene_builder_app" "${{ matrix.artifact }}"
+          cp "target/${{ matrix.target }}/release/scene_builder_cli" "${{ matrix.cli_artifact }}"
+          chmod +x "${{ matrix.artifact }}" "${{ matrix.cli_artifact }}"
+
+      - name: Package Windows artifacts
+        if: matrix.platform == 'windows-latest'
+        shell: pwsh
+        run: |
+          Copy-Item "target/${{ matrix.target }}/release/scene_builder_app.exe" "${{ matrix.artifact }}"
+          Copy-Item "target/${{ matrix.target }}/release/scene_builder_cli.exe" "${{ matrix.cli_artifact }}"
+
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          files: |
+            ${{ matrix.artifact }}
+            ${{ matrix.cli_artifact }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tagName: ${{ github.ref_type == 'tag' && github.ref_name || 'v__VERSION__' }}
-          releaseName: SexLab Scene Builder ${{ github.ref_type == 'tag' && github.ref_name || 'v__VERSION__' }}
-          releaseBody: See the assets to download this version and install.
-          releaseDraft: true
-          prerelease: false

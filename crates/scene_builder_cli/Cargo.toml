@@ -1,0 +1,16 @@
+[package]
+name = "scene_builder_cli"
+version = "3.0.0"
+description = "CLI for SexLab Scene Builder"
+authors = ["Scrab", "I unpause", "Miss Corruption"]
+license = "Apache-2.0"
+edition = "2021"
+rust-version = "1.95.0"
+
+[[bin]]
+name = "scene_builder_cli"
+path = "src/main.rs"
+
+[dependencies]
+scene_builder_core = { path = "../scene_builder_core" }
+clap = { version = "4", features = ["derive"] }
